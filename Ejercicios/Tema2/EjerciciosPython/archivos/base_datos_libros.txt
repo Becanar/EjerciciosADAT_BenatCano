@@ -1,0 +1,2 @@
+{'nombre': 'El guardian entre el centeno', 'autor': 'J.D Salinger', 'precio': 18.95, 'precio_descuento': 9.99, 'num_paginas': 237}
+{'nombre': 'La divina comedia', 'autor': 'Dante Alighieri', 'precio': 49.99, 'precio_descuento': 40.0, 'num_paginas': 1242}
