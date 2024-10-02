@@ -1,8 +1,10 @@
 import java.io.*;
+import java.nio.Buffer;
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class GestorOlimpiadas {
+public class GestorOlimpiadas { //AL HABER ERRORES EN EL FICHERO CSV(COMAS DONDE NO DEBEN), ES POSIBLE QUE NO COJA LOS DATOS EXACTAMENTE BIEN
 
     private static final String RUTA_ATHLETES="archivos/athlete_events.csv";
     private static final String RUTA_OLIMPIADAS="archivos/olimpiadas.csv";
@@ -50,19 +52,40 @@ public class GestorOlimpiadas {
             System.out.println("ERROR! EL OBJETO ORIGINAL NO ES UN FICHERO!");
             return false;
         }
-        try(BufferedReader br=new BufferedReader(new FileReader(athletes));BufferedWriter bw=new BufferedWriter(new FileWriter(RUTA_OLIMPIADAS))) {
+        ArrayList<String> olimpiadas=new ArrayList<>();
+        try(BufferedReader br=new BufferedReader(new FileReader(athletes))) {
         String linea=br.readLine();
         while(linea!=null){
             String[] lineas=linea.split(",");
-            String row=lineas[8]+","+lineas[9]+";"+lineas[10]+";"+lineas[11];
-            bw.write(row);
-            bw.newLine();
+            String row=lineas[8]+","+lineas[9]+","+lineas[10]+","+lineas[11];
+            boolean existe=false;
+            for(String str: olimpiadas){
+                if(str.equalsIgnoreCase(row)){
+                    existe=true;
+                }
+            }
+            if(!existe){
+                olimpiadas.add(row);
+            }
             linea=br.readLine();
         }
         } catch (IOException e) {
             System.out.println("ERROR! ERROR EN LA ENTRADA/SALIDA DE DATOS!");
             return false;
         }
+        try(BufferedWriter bw=new BufferedWriter(new FileWriter(RUTA_OLIMPIADAS))){
+            int cont=olimpiadas.size();
+            for(String str: olimpiadas){
+                bw.write(str);
+                cont--;
+                if(cont>0){
+                bw.newLine();}
+            }
+        } catch (IOException e) {
+            System.out.println("ERROR! ERROR EN LA ENTRADA/SALIDA DE DATOS!");
+            return false;
+        }
+        System.out.println("FICHERO CREADO CORRECTAMENTE");
         return true;
     }
     //Metodo2
