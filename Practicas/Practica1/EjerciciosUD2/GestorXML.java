@@ -1,8 +1,13 @@
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -171,7 +176,7 @@ public class GestorXML {
 
 
                 Element deportistaElement = doc.createElement("deportista");
-                deportistaElement.setAttribute("id", ""+id);
+                deportistaElement.setAttribute("id", "" + id);
                 rootElement.appendChild(deportistaElement);
 
 
@@ -243,6 +248,51 @@ public class GestorXML {
     }
 
     private static void listarOlimpiadas() {
+        try {
+            SAXParserFactory factory = SAXParserFactory.newInstance();
+            SAXParser saxParser = factory.newSAXParser();
+
+            DefaultHandler handler = new DefaultHandler() {
+
+                boolean isJuegos = false;
+                String yearValue = "";
+
+                @Override
+                public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+                    if (qName.equalsIgnoreCase("olimpiada")) {
+                        // Obtener el valor del atributo 'year'
+                        yearValue = attributes.getValue("year");
+                    }
+
+                    if (qName.equalsIgnoreCase("juegos")) {
+                        isJuegos = true;
+                    }
+                }
+
+                @Override
+                public void characters(char[] ch, int start, int length) throws SAXException {
+                    if (isJuegos) {
+                        String juegosValue = new String(ch, start, length).trim();
+                        System.out.println("Games: " + juegosValue + ", Year: " + yearValue);
+                        isJuegos = false;
+                    }
+                }
+
+                @Override
+                public void endElement(String uri, String localName, String qName) throws SAXException {
+                    if (qName.equalsIgnoreCase("olimpiada")) {
+                        yearValue = "";
+                    }
+                }
+            };
+
+            File inputFile = new File(RUTA_XML_OLIMPIADAS);
+
+            saxParser.parse(inputFile, handler);
+
+        } catch (Exception e) {
+            System.out.println("ERROR! NO SE HA PODIDO LEER EL ARCHIVO!");
+        }
     }
 
     public static void main(String[] args) {
